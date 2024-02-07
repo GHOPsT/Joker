@@ -35,7 +35,6 @@ def descarga_paralela(url, fragmentos, nombre):
             ranges = [[i, i+tamF-1] for i in range (0, size, tamF)]
             ranges[-1][-1]=size
 
-            #Vamos a usar un diccionario compartido por los procesos, la clave será el orden que cada fragmento de bytes tiene en el archivo final.
             manager = Manager()
             d = manager.dict()
             #Lanzamos los procesos
@@ -60,5 +59,5 @@ def descarga_paralela(url, fragmentos, nombre):
 
 
 if __name__ == '__main__':
-    url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Acueductos_subterr%C3%A1neos_de_Cantalloc%2C_Nazca%2C_Per%C3%BA%2C_2015-07-29%2C_DD_09.JPG/220px-Acueductos_subterr%C3%A1neos_de_Cantalloc%2C_Nazca%2C_Per%C3%BA%2C_2015-07-29%2C_DD_09.JPG'
+    url = 'https://unsplash.com/es/fotos/un-hombre-con-pantalones-naranjas-y-una-camisa-azul-empuja-una-carretilla-TjGG7Mg3U0o'
     descarga_paralela(url, 10, 'imagen1.jpg')
