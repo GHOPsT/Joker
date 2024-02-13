@@ -59,5 +59,5 @@ def descarga_paralela(url, fragmentos, nombre):
 
 
 if __name__ == '__main__':
-    url = 'https://unsplash.com/es/fotos/un-hombre-con-pantalones-naranjas-y-una-camisa-azul-empuja-una-carretilla-TjGG7Mg3U0o'
+    url = 'https://static.wikia.nocookie.net/typemoon/images/9/98/Caster_Anastasia_FGO_1.png/revision/latest?cb=20210402194132&path-prefix=es'
     descarga_paralela(url, 10, 'imagen1.jpg')

@@ -1,4 +1,4 @@
-#Código de Recibir WhatsApp y crear una respuesta con ChatGPT
+from pcproject import descarga_paralela
 from flask import Flask, jsonify, request
 app = Flask(__name__)
 
@@ -35,29 +35,6 @@ def webhook_whatsapp():
     #ESCRIBIMOS EL NUMERO DE TELEFONO Y EL MENSAJE EN EL ARCHIVO TEXTO
     #SI HAY UN MENSAJE
     if mensaje is not None:
-        
-        #import openai
-        # Indica el API Key
-        #openai.api_key = "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"
-        # Uso de ChapGPT en Python
-        #model_engine = "gpt-3.5-turbo"
-        #prompt = mensaje
-        #completion = openai.Completion.create(engine=model_engine,
-        #                                    prompt=prompt,
-        #                                    max_tokens=1024,
-        #                                      n=1,
-        #                                    stop=None,
-        #                                    temperature=0.7)
-        
-        #respuesta=""
-        #for choice in completion.choices:
-        #    respuesta=respuesta+choice.text
-        #    print(f"Response: %s" % choice.text)
-        #respuesta=respuesta.replace("\\n","\\\n")
-        #respuesta=respuesta.replace("\\","")
-        #f = open("texto.txt", "w")
-        #f.write(respuesta)
-        #f.close()
         respuesta = obtener_respuesta_predeterminada(mensaje)
         if respuesta:
             enviar(telefonoCliente,respuesta)
@@ -78,7 +55,7 @@ def obtener_respuesta_predeterminada(mensaje):
 def enviar(telefonoRecibe,respuesta):
     from heyoo import WhatsApp
     #TOKEN DE ACCESO DE FACEBOOK
-    token='EAANA5n8mCIYBO1SPEycs1L0rzXwMrVd8ZAij6l4L0YzZAbm7a9RTNZCSlOMK1sJs7ZAbQAdCJZClQ3vn6WQQg3p3NZBaoDiUkv59F3awmY2vhdONR4ud3zYgGaNMfwwAc5l02K4ZCqW4uNQg1EQvOOHyhZC24oUZARFtiZAw3ZCxphAo0hsZCfsD1h2XEu30IC1SyJmEMFhwUMXZASHDSKF2XEQuPsawjKjN8kGldhG0ZD'
+    token='EAANA5n8mCIYBO6iAAxDTJ9wXTDCQ2ZAr7BGNlXBxriJABUDTtsDZC2L9fg1NNkoOWdWupW6dFAvsmciJpIPUD7ZBu0n9BZBryZCT3BlbEDq3bdZB7bWO4DbcFPNyDzMYZAyxtF6cD1uhHCvr917YQqOVrBtbnlkUzkjGcglbPUaQSEqb1bSUKbIpaZBMMgcEb98SIqQmt42ZBXMBXUZBHXdMW7Iy9cCKOYTqyEDZAWG'
     #IDENTIFICADOR DE NÚMERO DE TELÉFONO
     idNumeroTeléfono='205842575953756'
     #INICIALIZAMOS ENVIO DE MENSAJES
