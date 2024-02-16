@@ -1,4 +1,5 @@
 import urllib.request
+import os
 from multiprocessing import Process, Manager, Barrier, Lock
 
 def descargar(url, orden, rango, frag, barrier, lock, retry_limit=3):
@@ -24,7 +25,7 @@ def descargar(url, orden, rango, frag, barrier, lock, retry_limit=3):
     finally:
         barrier.wait()
 
-def descarga_paralela(url, fragmentos, nombre):
+def descarga_paralela(url, fragmentos, nombre, directorio='images'):
     ranges = None
     try:
         with urllib.request.urlopen(url) as f:
@@ -59,7 +60,8 @@ def descarga_paralela(url, fragmentos, nombre):
                 barrier.wait()
 
                 # Reconstruimos el archivo usando cada fragmento en su orden correcto:
-                with open(nombre, 'wb') as f:
+                ruta_completa = os.path.join(directorio, nombre)
+                with open(ruta_completa, 'wb') as f:
                     for i in range(fragmentos):
                         data = d[i]
                         if data is None or data == '#Error':
@@ -69,7 +71,8 @@ def descarga_paralela(url, fragmentos, nombre):
                             print(f"El fragmento {i} no está presente en el diccionario compartido.")
                             f.write(data)
                     else:
-                        print('Archivo descargado y reconstruido con éxito.')
+                        print('Archivo descargado y reconstruido con éxito en el directorio:{ruta_completa}')
+                        return ruta_completa
     except urllib.error.URLError as e:
         print(f"Error al abrir la URL: {e}")
     except Exception as e:
@@ -79,8 +82,8 @@ if __name__ == '__main__':
     with Manager() as manager:  # Utiliza el Manager como un contexto para garantizar la limpieza adecuada
         lock = manager.Lock()
         try:
-            url = 'https://static.wikia.nocookie.net/typemoon/images/9/98/Caster_Anastasia_FGO_1.png/revision/latest?cb=20210402194132&path-prefix=es'
-            descarga_paralela(url, 10, 'imagen3.jpg')
+            url = 'https://images.unsplash.com/photo-1703179159632-d5c6842a1cf2?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+            descarga_paralela(url, 10, 'imagen5.jpg', directorio='images')
         except Exception as e:
             print(f"Error durante la descarga: {e}")
 
