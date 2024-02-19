@@ -25,6 +25,22 @@ def ik_subir_imagen_desde_url(url, nombre_archivo):
     except Exception as e:
         return f'ERROR: {e}'
     
+def ik_subir_imagen_url(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            print("Subiendo la imagen a ImageKit...")
+            res = ik.upload_file(file=response.content, file_name="imagen_api.jpg")
+            status_code = res.response_metadata.http_status_code
+            if status_code == 200:
+                return res.response_metadata.raw
+            else:
+                return f'ERROR: {status_code}'
+        else:
+            return f'ERROR: No se pudo descargar la imagen desde la URL. Código de estado: {response.status_code}'
+    except Exception as e:
+        return f'ERROR: {e}'
+    
 def delete_image(file_id):
     try:
         res = ik.delete_file(file_id=file_id)

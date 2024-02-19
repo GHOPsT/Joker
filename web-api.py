@@ -1,9 +1,18 @@
 from pcproject import descarga_paralela # Import descarga_paralela function from pcproject module
+from imagekit_api import ik_subir_imagen_url
 from flask import Flask, jsonify, request
 from heyoo import WhatsApp
 import os
 import urllib.request
 from multiprocessing import Process, Manager, Barrier, Lock, freeze_support
+from imagekitio import  ImageKit
+
+
+IK_PUBLIC = "public_kvsihz1+EXedGSE+ZnfbnAo5BpA="
+IK_PRIVATE = "private_Mxa6LgyTZPTBrQXH9MaIzir7kqU="
+IK_URL = "https://ik.imagekit.io/PPyC"
+
+ik = ImageKit(public_key=IK_PUBLIC, private_key=IK_PRIVATE, url_endpoint=IK_URL)
 
 if __name__ == '__main__':
     freeze_support()
@@ -11,6 +20,8 @@ if __name__ == '__main__':
     lock = manager.Lock()
 
 app = Flask(__name__)
+
+# ----------------------------- DESCARGA PARALELA FUNCIONES ------------------------------------
 
 def descargar(url, orden, rango, frag, barrier, lock):
     try:
@@ -72,6 +83,7 @@ def descarga_paralela(url, fragmentos, nombre, directorio='images'):
         print(f"Error desconocido: {e}")
 
 #---------------------------------------------------------------------------------------
+# ------------ Biblioteca de Respuestas ------------------------------------------------
 
 # Definir respuestas predeterminadas según palabras clave
 respuestas_predeterminadas = {
@@ -86,6 +98,10 @@ comandos_con_entrada = {
     "descargar": "Descargando el archivo desde {} con {} fragmentos y guardándolo como {}"
     # Agrega aquí más comandos que requieran una entrada adicional
 }
+
+# ---------------------------------------------------------------------------------------
+# ---------------------- WEBHOOK - API WHATSAPP ----------------------------
+
 #CUANDO RECIBAMOS LAS PETICIONES EN ESTA RUTA
 @app.route("/webhook/", methods=["POST", "GET"])
 def webhook_whatsapp():
@@ -117,6 +133,9 @@ def webhook_whatsapp():
                 return jsonify({"status": "success"}, 200)
     return jsonify({"status": "error", "message": "Datos de solicitud no válidos"}, 400)
 
+# ------------------------------------------------------------------------------
+# ---------------- RECIBO DE RESPUESTAS  ------------------------------------
+
 def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
     # Convertir el mensaje a minúsculas para hacer la comparación sin distinción de mayúsculas y minúsculas
     mensaje = mensaje.lower()
@@ -135,11 +154,15 @@ def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
                 url, fragmentos, nombre = entrada.split()  # Aquí asumimos que la entrada adicional son tres valores separados por espacios
                 descarga_paralela(url, int(fragmentos), nombre, directorio='images')  # Aquí debes implementar la lógica para descargar el archivo
                 ruta_imagen = os.path.join("images", nombre)
+                ik_subir_imagen_url(ruta_imagen)
                 enviar_imagen(telefonoRecibe, ruta_imagen)
                 return formato_respuesta.format(url, fragmentos, nombre)  # Aquí debes implementar la lógica para obtener la respuesta del comando
             
     # Si no hay coincidencia con palabras clave, devuelve None
     return None
+
+# -------------------------------------------------------------------
+# ------------------ ENVIO DE RESPUESTAS ----------------------------------------
 
 def enviar_imagen(telefono_recibe, ruta_imagen):
     token='EAANA5n8mCIYBO6uFZBeZAwGhg8EWQZAF3J0Pg5ZCje6COo7kZB9xVGZBhvdVu1ekH06cvu2GNW9J04F9sQPEww1ZBuaMIOqCJbklzLof7u1ZCBIgXACY92xDlNXo9yAX72EkCOWI5AZCFDU5hZC34hJt7FSFxN89BGfaqqZCHCc7pdEJmLtQwhid6Wo9ZC1bWx88QrwC0MjHN0Tk1ZCG5TSeh75YoieQF0u8RkKuMU2gZD'
@@ -162,6 +185,7 @@ def enviar(telefonoRecibe,respuesta):
         mensajeWa.send_message(respuesta, telefonoRecibe)
     else:
         print("Error: No se pudo determinar el número de teléfono del destinatario.")
-#INICIAMSO FLASK
+
+#INICIAMOS FLASK
 if __name__ == "__main__":
     app.run(debug=True)
