@@ -1,8 +1,77 @@
-from pcproject import descarga_paralela
+from pcproject import descarga_paralela # Import descarga_paralela function from pcproject module
 from flask import Flask, jsonify, request
 from heyoo import WhatsApp
 import os
+import urllib.request
+from multiprocessing import Process, Manager, Barrier, Lock, freeze_support
+
+if __name__ == '__main__':
+    freeze_support()
+    manager = Manager()
+    lock = manager.Lock()
+
 app = Flask(__name__)
+
+def descargar(url, orden, rango, frag, barrier, lock):
+    try:
+        print(f'Obteniendo fragmento {orden}. Descargando desde byte {rango[0]} hasta byte {rango[1]}.' )
+        req = urllib.request.Request(url)
+        req.add_header('Range', f'bytes={rango[0]}-{rango[1]}')
+
+        with lock:
+            data = urllib.request.urlopen(req).read()
+            frag[orden] = data
+            print(f'Fragmento {orden} descargado correctamente. Obtenidos {len(data)} bytes.')
+    except Exception as e:
+        print(f'Error al descargar fragmento {orden}: {e}')
+    finally:
+        barrier.wait()
+
+def descarga_paralela(url, fragmentos, nombre, directorio='images'):
+    ranges = None
+
+    try:
+        with urllib.request.urlopen(url) as f:
+            if f.getheader("Accept-Ranges", "none").lower() != "bytes":
+                print('Descarga parcial no soportada, iniciando descarga...')
+            else:
+                size = int(f.getheader("Content-Length", "none"))
+                print(f'Tamaño del archivo: {size} bytes.')
+                tamF = size // fragmentos
+                print(f'Fragmentos: {fragmentos}. Tamaño aproximado por fragmento: {tamF} bytes.')
+                ranges = [[i, i + tamF - 1] for i in range(0, size, tamF)]
+                ranges[-1][-1] = size
+
+                manager = Manager()
+                d = manager.dict()
+
+                barrier = Barrier(fragmentos + 1)
+
+                workers = [Process(target=descargar, args=(url, i, r, d, barrier, lock)) for i, r in enumerate(ranges)]
+
+                for w in workers:
+                    w.start()
+
+                barrier.wait()
+
+                ruta_completa = os.path.join(directorio, nombre)
+                with open(ruta_completa, 'wb') as f:
+                    for i in range(fragmentos):
+                        data = d.get(i, None)
+                        if data is None or data == '#Error':
+                            print(f'El fragmento {i} no se pudo descargar. No se puede reconstruir el archivo.')
+                            break
+                        else:
+                            f.write(data)
+                    else:
+                        print(f'Archivo descargado y reconstruido con éxito en: {ruta_completa}')
+                        return ruta_completa
+    except urllib.error.URLError as e:
+        print(f"Error al abrir la URL: {e}")
+    except Exception as e:
+        print(f"Error desconocido: {e}")
+
+#---------------------------------------------------------------------------------------
 
 # Definir respuestas predeterminadas según palabras clave
 respuestas_predeterminadas = {
@@ -73,7 +142,7 @@ def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
     return None
 
 def enviar_imagen(telefono_recibe, ruta_imagen):
-    token = 'EAANA5n8mCIYBO4WHwrMguHCZCZAb55h3goDpqazIMyA0Iya6zjcHEkvA0l1iGUNVOCoK4Pf3pRVzxOpZCTCMYBZCWP3pEmGLTZBx2jZCCdDBexp688uBXgm8LJ3eNXmU0Yya5DbTh0s50NEvP74mA1hoLeJHgnOPhtS1w4sh8KxHWJnlzwa6YORPNr8EzEWam0dcakL0hZCWZCMEi8lYGSZCTlC9TJUwWRA0OYKQZD'
+    token='EAANA5n8mCIYBO6uFZBeZAwGhg8EWQZAF3J0Pg5ZCje6COo7kZB9xVGZBhvdVu1ekH06cvu2GNW9J04F9sQPEww1ZBuaMIOqCJbklzLof7u1ZCBIgXACY92xDlNXo9yAX72EkCOWI5AZCFDU5hZC34hJt7FSFxN89BGfaqqZCHCc7pdEJmLtQwhid6Wo9ZC1bWx88QrwC0MjHN0Tk1ZCG5TSeh75YoieQF0u8RkKuMU2gZD'
     id_numero_telefono = '205842575953756'
     mensaje_wa = WhatsApp(token, id_numero_telefono)
     telefono_recibe = telefono_recibe.replace("521", "52")
@@ -81,7 +150,7 @@ def enviar_imagen(telefono_recibe, ruta_imagen):
 
 def enviar(telefonoRecibe,respuesta):
     #TOKEN DE ACCESO DE FACEBOOK
-    token='EAANA5n8mCIYBO4WHwrMguHCZCZAb55h3goDpqazIMyA0Iya6zjcHEkvA0l1iGUNVOCoK4Pf3pRVzxOpZCTCMYBZCWP3pEmGLTZBx2jZCCdDBexp688uBXgm8LJ3eNXmU0Yya5DbTh0s50NEvP74mA1hoLeJHgnOPhtS1w4sh8KxHWJnlzwa6YORPNr8EzEWam0dcakL0hZCWZCMEi8lYGSZCTlC9TJUwWRA0OYKQZD'
+    token='EAANA5n8mCIYBO6uFZBeZAwGhg8EWQZAF3J0Pg5ZCje6COo7kZB9xVGZBhvdVu1ekH06cvu2GNW9J04F9sQPEww1ZBuaMIOqCJbklzLof7u1ZCBIgXACY92xDlNXo9yAX72EkCOWI5AZCFDU5hZC34hJt7FSFxN89BGfaqqZCHCc7pdEJmLtQwhid6Wo9ZC1bWx88QrwC0MjHN0Tk1ZCG5TSeh75YoieQF0u8RkKuMU2gZD'
     #IDENTIFICADOR DE NÚMERO DE TELÉFONO
     idNumeroTeléfono='205842575953756'
     #INICIALIZAMOS ENVIO DE MENSAJES
@@ -95,4 +164,4 @@ def enviar(telefonoRecibe,respuesta):
         print("Error: No se pudo determinar el número de teléfono del destinatario.")
 #INICIAMSO FLASK
 if __name__ == "__main__":
-  app.run(debug=True)
+    app.run(debug=True)
