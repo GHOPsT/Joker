@@ -7,6 +7,7 @@ import urllib.request
 from multiprocessing import Process, Manager, Barrier, Lock, freeze_support
 from imagekitio import  ImageKit
 import requests
+import json
 
 IK_PUBLIC = "public_kvsihz1+EXedGSE+ZnfbnAo5BpA="
 IK_PRIVATE = "private_Mxa6LgyTZPTBrQXH9MaIzir7kqU="
@@ -185,8 +186,12 @@ def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
                 url, fragmentos, nombre = entrada.split()  # Aquí asumimos que la entrada adicional son tres valores separados por espacios
                 descarga_paralela(url, int(fragmentos), nombre, directorio='images')  # Aquí debes implementar la lógica para descargar el archivo
                 if nombre is not None:
-                    respuesta = ik_subir_imagen_url(nombre)
-                    url_imagen = respuesta['url']
+                    respuesta = ik_subir_imagen(nombre)
+                    if isinstance(respuesta, dict):
+                        respuesta_dict = respuesta
+                    else:
+                        respuesta_dict = json.loads(respuesta)
+                    url_imagen = respuesta_dict['url']
                     enviar_imagen(telefonoRecibe, url_imagen)
                 return formato_respuesta.format(url, fragmentos, nombre)  # Aquí debes implementar la lógica para obtener la respuesta del comando
             else:
@@ -199,15 +204,25 @@ def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
 # ------------------ ENVIO DE RESPUESTAS ----------------------------------------
 
 def enviar_imagen(telefono_recibe, ruta_imagen):
-    token='EAANA5n8mCIYBO6uFZBeZAwGhg8EWQZAF3J0Pg5ZCje6COo7kZB9xVGZBhvdVu1ekH06cvu2GNW9J04F9sQPEww1ZBuaMIOqCJbklzLof7u1ZCBIgXACY92xDlNXo9yAX72EkCOWI5AZCFDU5hZC34hJt7FSFxN89BGfaqqZCHCc7pdEJmLtQwhid6Wo9ZC1bWx88QrwC0MjHN0Tk1ZCG5TSeh75YoieQF0u8RkKuMU2gZD'
+    token = 'EAANA5n8mCIYBO7uRJNCWKgJbubFNCFjB2TlA2noxZA2LL05vxmA3QAEAOPsSnlTcRkaKlDW3UxjvWEnm7CeZBHFcbDuAuRStxRGw2ZBemTK4pJvCzrzhJRCOob34PKShXJtF0DKDiRS1c0dZCcSQBcqLOWmc8Nzl027pKYa2rzrql4mvSaFwn6FMw3QnONjQZCVqATgQXqqIBO21R9DhYyahyxlMoUWiucSJa'
     id_numero_telefono = '205842575953756'
-    mensaje_wa=WhatsApp(token, id_numero_telefono)
+    mensaje_wa = WhatsApp(token, id_numero_telefono)
     telefono_recibe = telefono_recibe.replace("521", "52")
-    mensaje_wa.send_image(image=ruta_imagen, recipient_id=telefono_recibe)
+    # Llamamos a la función ik_subir_imagen_url y obtenemos la respuesta
+    respuesta_ik = ik_subir_imagen(ruta_imagen)
+    # Procesamos la respuesta de ik_subir_imagen_url, que es una cadena JSON
+    try:
+        respuesta_dict = eval(respuesta_ik)
+        url_imagen = respuesta_dict.get('url', 'URL no disponible')
+    except (TypeError, SyntaxError):
+        url_imagen = 'URL no disponible'
+    # Enviamos la imagen con la URL obtenida
+    mensaje_wa.send_image(image=url_imagen, recipient_id=telefono_recibe)
+
 
 def enviar(telefonoRecibe,respuesta):
     #TOKEN DE ACCESO DE FACEBOOK
-    token='EAANA5n8mCIYBO6uFZBeZAwGhg8EWQZAF3J0Pg5ZCje6COo7kZB9xVGZBhvdVu1ekH06cvu2GNW9J04F9sQPEww1ZBuaMIOqCJbklzLof7u1ZCBIgXACY92xDlNXo9yAX72EkCOWI5AZCFDU5hZC34hJt7FSFxN89BGfaqqZCHCc7pdEJmLtQwhid6Wo9ZC1bWx88QrwC0MjHN0Tk1ZCG5TSeh75YoieQF0u8RkKuMU2gZD'
+    token='EAANA5n8mCIYBO7uRJNCWKgJbubFNCFjB2TlA2noxZA2LL05vxmA3QAEAOPsSnlTcRkaKlDW3UxjvWEnm7CeZBHFcbDuAuRStxRGw2ZBemTK4pJvCzrzhJRCOob34PKShXJtF0DKDiRS1c0dZCcSQBcqLOWmc8Nzl027pKYa2rzrql4mvSaFwn6FMw3QnONjQZCVqATgQXqqIBO21R9DhYyahyxlMoUWiucSJa'
     #IDENTIFICADOR DE NÚMERO DE TELÉFONO
     idNumeroTeléfono='205842575953756'
     #INICIALIZAMOS ENVIO DE MENSAJES
