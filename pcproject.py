@@ -82,8 +82,8 @@ if __name__ == '__main__':
     with Manager() as manager:  # Utiliza el Manager como un contexto para garantizar la limpieza adecuada
         lock = manager.Lock()
         try:
-            url = 'https://images.unsplash.com/photo-1703179159632-d5c6842a1cf2?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            descarga_paralela(url, 10, 'imagen5.jpg', directorio='images')
+            url = 'https://img.freepik.com/fotos-premium/fondo-pantalla-fotovoltaico-hd-8k-imagen-fotografica-stock_890746-35687.jpg?w=826'
+            descarga_paralela(url, 20, 'imagen8k.jpg', directorio='images')
         except Exception as e:
             print(f"Error durante la descarga: {e}")
 

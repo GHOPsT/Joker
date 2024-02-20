@@ -1,5 +1,6 @@
 from imagekitio import ImageKit
 from pprint import pprint
+from base64 import b64encode
 import requests
 import os
 
@@ -7,7 +8,25 @@ IK_PUBLIC = "public_kvsihz1+EXedGSE+ZnfbnAo5BpA="
 IK_PRIVATE = "private_Mxa6LgyTZPTBrQXH9MaIzir7kqU="
 IK_URL = "https://ik.imagekit.io/PPyC"
 
+RUTA_DEFECTO = r"C:\Users\GHOST\OneDrive\Escritorio\Joker\images"
+
 ik = ImageKit(public_key=IK_PUBLIC, private_key=IK_PRIVATE, url_endpoint=IK_URL)
+
+def ik_subir_imagen(nombre_archivo):
+
+    ruta_completa = os.path.join(RUTA_DEFECTO,nombre_archivo)
+    with open(ruta_completa, "rb") as f:
+        imagen = b64encode(f.read())
+    print("Subiendo la imagen a ImageKit")
+    try:
+        res = ik.upload_file(file=imagen, file_name=nombre_archivo)
+    except Exception as e:
+        return f'ERROR: {e}'
+    status_code = res.response_metadata.http_status_code
+    if status_code == 200:
+        return res.response_metadata.raw
+    else:
+        return f'ERROR: {status_code}'
 
 def ik_subir_imagen_desde_url(url, nombre_archivo):
     try:
@@ -26,6 +45,7 @@ def ik_subir_imagen_desde_url(url, nombre_archivo):
         return f'ERROR: {e}'
     
 def ik_subir_imagen_url(url):
+    ruta_completa = os.path.join(RUTA_DEFECTO,url)
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -40,6 +60,8 @@ def ik_subir_imagen_url(url):
             return f'ERROR: No se pudo descargar la imagen desde la URL. Código de estado: {response.status_code}'
     except Exception as e:
         return f'ERROR: {e}'
+    
+
     
 def delete_image(file_id):
     try:

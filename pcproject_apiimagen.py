@@ -1,16 +1,21 @@
 from imagekitio import ImageKit
 from base64 import b64encode
 from pprint import pprint
+import os
 
 IK_PUBLIC = "public_JCVYuD+GYX4bjtK7ffiyCMThAeU="
 IK_PRIVATE = "private_FzcJdbiv48KjRDyq9M0g13uWKUA="
 IK_URL = "https://ik.imagekit.io/ProgramacionParalela"
 
+RUTA_POR_DEFECTO = r"C:\Users\GHOST\OneDrive\Escritorio\Joker\images"
+
 # Instanciamos ImageKit
 ik = ImageKit(public_key=IK_PUBLIC, private_key=IK_PRIVATE, url_endpoint=IK_URL)
 
-def ik_subir_imagen(ruta_imagen, nombre_archivo):
-    with open(ruta_imagen, "rb") as f:
+def ik_subir_imagen(nombre_archivo):
+
+    ruta_completa = os.path.join(RUTA_POR_DEFECTO,nombre_archivo)
+    with open(ruta_completa, "rb") as f:
         imagen = b64encode(f.read())
     print("Subiendo la imagen a ImageKit")
     try:
@@ -24,7 +29,8 @@ def ik_subir_imagen(ruta_imagen, nombre_archivo):
         return f'ERROR: {status_code}'
 
 if __name__ == '__main__':
-    res = ik_subir_imagen("C:/Users/Esther Nehisbell/Downloads/photo.jpg", "photo.jpg")
+    nombre_personalizado = "prueba.jpg"
+    res = ik_subir_imagen(nombre_personalizado)
     pprint(res, sort_dicts=False)
 
 

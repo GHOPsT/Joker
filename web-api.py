@@ -1,16 +1,18 @@
 from pcproject import descarga_paralela # Import descarga_paralela function from pcproject module
-from imagekit_api import ik_subir_imagen_url
+from imagekit_api import ik_subir_imagen
 from flask import Flask, jsonify, request
 from heyoo import WhatsApp
 import os
 import urllib.request
 from multiprocessing import Process, Manager, Barrier, Lock, freeze_support
 from imagekitio import  ImageKit
-
+import requests
 
 IK_PUBLIC = "public_kvsihz1+EXedGSE+ZnfbnAo5BpA="
 IK_PRIVATE = "private_Mxa6LgyTZPTBrQXH9MaIzir7kqU="
 IK_URL = "https://ik.imagekit.io/PPyC"
+
+RUTA_PREDETERMINADA = r"C:\Users\GHOST\OneDrive\Escritorio\Joker\images"
 
 ik = ImageKit(public_key=IK_PUBLIC, private_key=IK_PRIVATE, url_endpoint=IK_URL)
 
@@ -20,6 +22,35 @@ if __name__ == '__main__':
     lock = manager.Lock()
 
 app = Flask(__name__)
+
+# ---------------------- Enviar imagenes a apip funcion --------------------------------
+def ik_subir_imagen_url(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            print("Subiendo la imagen a ImageKit...")
+            res = ik.upload_file(file=response.content, file_name="imagen_api.jpg")
+            status_code = res.response_metadata.http_status_code
+            if status_code == 200:
+                return res.response_metadata.raw
+            else:
+                return f'ERROR: {status_code}'
+        else:
+            return f'ERROR: No se pudo descargar la imagen desde la URL. Código de estado: {response.status_code}'
+    except Exception as e:
+        return f'ERROR: {e}'
+    
+def delete_image(file_id):
+    try:
+        res = ik.delete_file(file_id=file_id)
+    except Exception as e:
+        return f'ERROR: {e.message}'
+    status_code = res.response_metadata.http_status_code
+    if status_code == 204:
+        return "OK"
+    else:
+        return f'ERROR: {status_code}'
+
 
 # ----------------------------- DESCARGA PARALELA FUNCIONES ------------------------------------
 
@@ -153,10 +184,13 @@ def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
             if comando == "descargar":
                 url, fragmentos, nombre = entrada.split()  # Aquí asumimos que la entrada adicional son tres valores separados por espacios
                 descarga_paralela(url, int(fragmentos), nombre, directorio='images')  # Aquí debes implementar la lógica para descargar el archivo
-                ruta_imagen = os.path.join("images", nombre)
-                ik_subir_imagen_url(ruta_imagen)
-                enviar_imagen(telefonoRecibe, ruta_imagen)
+                if nombre is not None:
+                    respuesta = ik_subir_imagen_url(nombre)
+                    url_imagen = respuesta['url']
+                    enviar_imagen(telefonoRecibe, url_imagen)
                 return formato_respuesta.format(url, fragmentos, nombre)  # Aquí debes implementar la lógica para obtener la respuesta del comando
+            else:
+                return "Error al descargar la imagen. Verifique el enlace e intentelo de nuevo. "
             
     # Si no hay coincidencia con palabras clave, devuelve None
     return None
@@ -167,7 +201,7 @@ def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
 def enviar_imagen(telefono_recibe, ruta_imagen):
     token='EAANA5n8mCIYBO6uFZBeZAwGhg8EWQZAF3J0Pg5ZCje6COo7kZB9xVGZBhvdVu1ekH06cvu2GNW9J04F9sQPEww1ZBuaMIOqCJbklzLof7u1ZCBIgXACY92xDlNXo9yAX72EkCOWI5AZCFDU5hZC34hJt7FSFxN89BGfaqqZCHCc7pdEJmLtQwhid6Wo9ZC1bWx88QrwC0MjHN0Tk1ZCG5TSeh75YoieQF0u8RkKuMU2gZD'
     id_numero_telefono = '205842575953756'
-    mensaje_wa = WhatsApp(token, id_numero_telefono)
+    mensaje_wa=WhatsApp(token, id_numero_telefono)
     telefono_recibe = telefono_recibe.replace("521", "52")
     mensaje_wa.send_image(image=ruta_imagen, recipient_id=telefono_recibe)
 
