@@ -203,20 +203,13 @@ def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
 # -------------------------------------------------------------------
 # ------------------ ENVIO DE RESPUESTAS ----------------------------------------
 
-def enviar_imagen(telefono_recibe, ruta_imagen):
+def enviar_imagen(telefono_recibe, url_imagen):
     token = 'EAANA5n8mCIYBO7uRJNCWKgJbubFNCFjB2TlA2noxZA2LL05vxmA3QAEAOPsSnlTcRkaKlDW3UxjvWEnm7CeZBHFcbDuAuRStxRGw2ZBemTK4pJvCzrzhJRCOob34PKShXJtF0DKDiRS1c0dZCcSQBcqLOWmc8Nzl027pKYa2rzrql4mvSaFwn6FMw3QnONjQZCVqATgQXqqIBO21R9DhYyahyxlMoUWiucSJa'
     id_numero_telefono = '205842575953756'
     mensaje_wa = WhatsApp(token, id_numero_telefono)
     telefono_recibe = telefono_recibe.replace("521", "52")
-    # Llamamos a la función ik_subir_imagen_url y obtenemos la respuesta
-    respuesta_ik = ik_subir_imagen(ruta_imagen)
-    # Procesamos la respuesta de ik_subir_imagen_url, que es una cadena JSON
-    try:
-        respuesta_dict = eval(respuesta_ik)
-        url_imagen = respuesta_dict.get('url', 'URL no disponible')
-    except (TypeError, SyntaxError):
-        url_imagen = 'URL no disponible'
-    # Enviamos la imagen con la URL obtenida
+    # Enviamos la URL de la imagen como un mensaje de texto
+    mensaje_wa.send_message(url_imagen, telefono_recibe)
     mensaje_wa.send_image(image=url_imagen, recipient_id=telefono_recibe)
 
 
