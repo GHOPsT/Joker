@@ -125,10 +125,7 @@ respuestas_predeterminadas = {
 }
 # Definir comandos que requieren una entrada adicional
 comandos_con_entrada = {
-    "clima": "El clima en {} es: {}",
-    "hora": "La hora en {} es: {}",
     "descargar": "Descargando el archivo desde {} con {} fragmentos y guardándolo como {}"
-    # Agrega aquí más comandos que requieran una entrada adicional
 }
 
 # ---------------------------------------------------------------------------------------

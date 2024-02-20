@@ -41,16 +41,10 @@ def descarga_paralela(url, fragmentos, nombre):
             # Lanzamos los procesos
             workers = [Process(target=descargar, args=(url, i, r, d)) for i, r in enumerate(ranges)]
 
-            # Medir el tiempo de inicio
-            start_time = time.time()
-
             for w in workers:
                 w.start()
             for w in workers:
                 w.join()
-
-            # Medir el tiempo de finalización
-            end_time = time.time()
 
             # Reconstruimos el archivo usando cada fragmento en su orden correcto:
             with open(nombre, 'wb') as f:
@@ -64,10 +58,11 @@ def descarga_paralela(url, fragmentos, nombre):
                 else:
                     print('Archivo descargado y reconstruido con éxito.')
 
-            # Calcular y mostrar el tiempo total de ejecución
-            total_time = end_time - start_time
-            print('Tiempo total de ejecución: {:.2f} segundos'.format(total_time))
-
 if __name__ == '__main__':
-    url = 'https://static.wikia.nocookie.net/typemoon/images/9/98/Caster_Anastasia_FGO_1.png/revision/latest?cb=20210402194132&path-prefix=es'
-    descarga_paralela(url, 10, 'imagen1.jpg')
+    url = 'https://images.unsplash.com/photo-1703179159632-d5c6842a1cf2?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+    
+    start_time = time.time()
+    descarga_paralela(url, 20, '20hiloprueba_final.jpg')
+    end_time = time.time()
+    elapsed_time = (end_time - start_time) * 1000000
+    print(f'Tiempo de ejecución: {elapsed_time} microsegundos')

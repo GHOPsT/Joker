@@ -1,6 +1,7 @@
 import urllib.request
 import os
 from multiprocessing import Process, Manager, Barrier, Lock
+import time
 
 def descargar(url, orden, rango, frag, barrier, lock, retry_limit=3):
     try:
@@ -82,8 +83,12 @@ if __name__ == '__main__':
     with Manager() as manager:  # Utiliza el Manager como un contexto para garantizar la limpieza adecuada
         lock = manager.Lock()
         try:
-            url = 'https://static.wikia.nocookie.net/typemoon/images/9/98/Caster_Anastasia_FGO_1.png/revision/latest?cb=20210402194132&path-prefix=es'
-            descarga_paralela(url, 20, 'imagen_anastacia.jpg', directorio='images')
+            url = 'https://images.unsplash.com/photo-1703179159632-d5c6842a1cf2?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+            start_time = time.time()
+            descarga_paralela(url, 20, '20hiosprueba_final_pcb.jpg', directorio='images')
+            end_time = time.time()
+            elapsed_time = (end_time - start_time) * 1000000
+            print(f'Tiempo de ejecución: {elapsed_time} microsegundos')
         except Exception as e:
             print(f"Error durante la descarga: {e}")
 
