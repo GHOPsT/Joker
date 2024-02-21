@@ -57,8 +57,14 @@ def descarga_paralela(url, fragmentos, nombre, directorio='images'):
                 for w in workers:
                     w.start()
 
+                start_time = time.time()
+
                 # Esperar a que todos los procesos completen la descarga antes de continuar
                 barrier.wait()
+
+                end_time = time.time()  # Tomamos el tiempo después de que todos los procesos han completado
+                elapsed_time = (end_time - start_time) * 1000000
+                print(f'Tiempo de ejecución: {elapsed_time} microsegundos')
 
                 # Reconstruimos el archivo usando cada fragmento en su orden correcto:
                 ruta_completa = os.path.join(directorio, nombre)
@@ -84,11 +90,7 @@ if __name__ == '__main__':
         lock = manager.Lock()
         try:
             url = 'https://images.unsplash.com/photo-1703179159632-d5c6842a1cf2?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            start_time = time.time()
-            descarga_paralela(url, 20, '20hiosprueba_final_pcb.jpg', directorio='images')
-            end_time = time.time()
-            elapsed_time = (end_time - start_time) * 1000000
-            print(f'Tiempo de ejecución: {elapsed_time} microsegundos')
+            descarga_paralela(url, 20, '20_hprueba_final_v2pcb.jpg', directorio='images')
         except Exception as e:
             print(f"Error durante la descarga: {e}")
 

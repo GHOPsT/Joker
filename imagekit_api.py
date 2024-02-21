@@ -61,8 +61,6 @@ def ik_subir_imagen_url(url):
     except Exception as e:
         return f'ERROR: {e}'
     
-
-    
 def delete_image(file_id):
     try:
         res = ik.delete_file(file_id=file_id)

@@ -39,12 +39,17 @@ def descarga_paralela(url, fragmentos, nombre):
             manager = Manager()
             d = manager.dict()
             # Lanzamos los procesos
+            start_time =time.time()
             workers = [Process(target=descargar, args=(url, i, r, d)) for i, r in enumerate(ranges)]
 
             for w in workers:
                 w.start()
             for w in workers:
                 w.join()
+
+            end_time = time.time()
+            elapsed_time = (end_time - start_time) * 1000000
+            print(f'Tiempo de ejecución: {elapsed_time} microsegundos')
 
             # Reconstruimos el archivo usando cada fragmento en su orden correcto:
             with open(nombre, 'wb') as f:
@@ -60,9 +65,5 @@ def descarga_paralela(url, fragmentos, nombre):
 
 if __name__ == '__main__':
     url = 'https://images.unsplash.com/photo-1703179159632-d5c6842a1cf2?q=80&w=1376&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-    
-    start_time = time.time()
     descarga_paralela(url, 20, '20hiloprueba_final.jpg')
-    end_time = time.time()
-    elapsed_time = (end_time - start_time) * 1000000
-    print(f'Tiempo de ejecución: {elapsed_time} microsegundos')
+    
