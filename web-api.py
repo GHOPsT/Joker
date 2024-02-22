@@ -93,7 +93,7 @@ def obtener_respuesta_predeterminada(mensaje, telefonoRecibe):
 # ------------------ ENVIO DE RESPUESTAS ----------------------------------------
 
 def enviar_imagen(telefono_recibe, url_imagen):
-    token='EAANA5n8mCIYBOZC276gQNIMR7KZAkTPyqLpuERLCLdClZCSJh936E9NxnlYxWrgV4JVJviTgOePkjX3ckevNZCfXz8bzhyZBWEGsMInoDlG7R5s2P3B6yZAvyOzzpcOf1kW1j8cY3nwhdeStuA5hGElVkhLZBp2BuW1oVx8fBOVf3WE1xnd5nQjYtrbEH1erjtf9vSs9RzYT2ZAYQ0KJ8JwsZBwEiOddViEAXASoZD'
+    token='EAANA5n8mCIYBOZBdxufhy1ZBIKTFTt2vUtTBdyFtBf6toPevdpn1rnLCA5XgLvQvfTDfPSjCbcV8IPkFtn6C8BUniCYyBnEspLT1GUzg3Lc1bk2BQVUHxdZCFhFPjICYiIzhKcBwBrNAWzY6vl65uOvNmM4N4uvZCQZB63L6kslZCZCBeaRudGNSRxtI503dSTscvL2EG6sBDSNVyoUcS7JiJ0XuUeY7HAvnVUZD'
     id_numero_telefono = '205842575953756'
     mensaje_wa = WhatsApp(token, id_numero_telefono)
     telefono_recibe = telefono_recibe.replace("521", "52")
@@ -104,7 +104,7 @@ def enviar_imagen(telefono_recibe, url_imagen):
 
 def enviar(telefonoRecibe,respuesta):
     #TOKEN DE ACCESO DE FACEBOOK
-    token='EAANA5n8mCIYBOZC276gQNIMR7KZAkTPyqLpuERLCLdClZCSJh936E9NxnlYxWrgV4JVJviTgOePkjX3ckevNZCfXz8bzhyZBWEGsMInoDlG7R5s2P3B6yZAvyOzzpcOf1kW1j8cY3nwhdeStuA5hGElVkhLZBp2BuW1oVx8fBOVf3WE1xnd5nQjYtrbEH1erjtf9vSs9RzYT2ZAYQ0KJ8JwsZBwEiOddViEAXASoZD'
+    token='EAANA5n8mCIYBOZBdxufhy1ZBIKTFTt2vUtTBdyFtBf6toPevdpn1rnLCA5XgLvQvfTDfPSjCbcV8IPkFtn6C8BUniCYyBnEspLT1GUzg3Lc1bk2BQVUHxdZCFhFPjICYiIzhKcBwBrNAWzY6vl65uOvNmM4N4uvZCQZB63L6kslZCZCBeaRudGNSRxtI503dSTscvL2EG6sBDSNVyoUcS7JiJ0XuUeY7HAvnVUZD'
     #IDENTIFICADOR DE NÚMERO DE TELÉFONO
     idNumeroTeléfono='205842575953756'
     #INICIALIZAMOS ENVIO DE MENSAJES
